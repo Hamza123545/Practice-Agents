@@ -1,14 +1,23 @@
-# Welcome to Chainlit! 🚀🤖
+# Welcome to AI Travel Designer! 🌍
 
-Hi there, Developer! 👋 We're excited to have you on board. Chainlit is a powerful tool designed to help you prototype, debug and share applications built on top of LLMs.
+Hi there! I'm your AI travel designer, designed to help you plan the perfect trip from start to finish.
 
-## Useful Links 🔗
+## What I Can Help You With
 
-- **Documentation:** Get started with our comprehensive [Chainlit Documentation](https://docs.chainlit.io) 📚
-- **Discord Community:** Join our friendly [Chainlit Discord](https://discord.gg/k73SQ3FyUh) to ask questions, share your projects, and connect with other developers! 💬
+- **Destination Discovery**: Find the perfect travel destinations based on your interests
+- **Flight Booking**: Get flight options and pricing for your chosen destination
+- **Hotel Selection**: Find the best accommodations with ratings and prices
+- **Local Exploration**: Discover attractions, restaurants, and experiences
 
-We can't wait to see what you create with Chainlit! Happy coding! 💻😊
+## How It Works
 
-## Welcome screen
+I use a team of specialized AI agents to provide comprehensive travel planning:
+- **DestinationAgent**: Helps you find the perfect travel destinations
+- **BookingAgent**: Handles flight and hotel bookings with real-time options
+- **ExploreAgent**: Suggests local attractions, food, and cultural experiences
 
-To modify the welcome screen, edit the `chainlit.md` file at the root of your project. If you do not want a welcome screen, just leave this file empty.
+## Getting Started
+
+Simply tell me about your travel preferences, budget, or any specific destinations you're interested in! I'll automatically connect you with the right specialist to create your dream trip.
+
+Ready to start planning your adventure? Let's begin! ✈️

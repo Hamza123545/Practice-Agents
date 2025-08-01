@@ -13,8 +13,8 @@ gemini_api_key = os.getenv("GEMINI_API_KEY")
 if not gemini_api_key:
     raise ValueError("GEMINI_API_KEY is not set in your .env file.")
 
-# === Skill roadmap tool ===
-def get_skill_roadmap(field: str) -> str:
+# === Career roadmap tool ===
+def get_career_roadmap(field: str) -> str:
     field = field.lower()
     if "software" in field:
         return "🧑‍💻 Software Engineering Roadmap:\n1. Learn Python or Java\n2. Study Data Structures\n3. Build full-stack apps\n4. Version control (Git)\n5. Interview prep"
@@ -25,12 +25,15 @@ def get_skill_roadmap(field: str) -> str:
     else:
         return f"⚠️ No roadmap found for '{field}'. Try software, data, or medicine."
 
-# === on_handoff function ===
-def on_handoff(agent: Agent, ctx: RunContextWrapper[None]):
-    cl.Message(
-        content=f"🔄 **Switching to `{agent.name}`** to help you better.",
-        author="System"
-    ).send()
+# === Handoff Functions ===
+def on_handoff_to_skill(ctx: RunContextWrapper[None]) -> Agent:
+    # Note: We can't use async/await here due to handoff function signature
+    print("📚 Switching to SkillAgent - I'll create a detailed skill roadmap!")
+    return SkillAgent
+
+def on_handoff_to_job(ctx: RunContextWrapper[None]) -> Agent:
+    print("💼 Switching to JobAgent - I'll help you explore job roles and salaries!")
+    return JobAgent
 
 # === on_chat_start ===
 @cl.on_chat_start
@@ -53,26 +56,36 @@ async def start():
 
     # === Specialized Agents ===
     skill_agent = Agent(
-        name="Skill Advisor",
-        instructions="You provide step-by-step skill roadmaps based on the user's career interest. Ask for their target field and use get_skill_roadmap().",
+        name="SkillAgent",
+        instructions="You provide step-by-step skill roadmaps based on the user's career interest. Ask for their target field and use get_career_roadmap().",
         model=model,
-        tools={"get_skill_roadmap": get_skill_roadmap}
+        tools={"get_career_roadmap": get_career_roadmap}
     )
 
     job_agent = Agent(
-        name="Job Expert",
+        name="JobAgent",
         instructions="You suggest popular job roles, responsibilities, and how to prepare for them.",
         model=model
     )
 
-    # === Main Agent with Handoff ===
+    # === Main Agent with Proper Handoffs ===
     career_agent = Agent(
-        name="Career Mentor",
-        instructions="You are a friendly AI that helps users explore careers. If the user asks about skills or learning, handoff to Skill Advisor. If they ask about job titles or salaries, handoff to Job Expert.",
+        name="CareerAgent",
+        instructions="""You are a friendly AI that helps users explore careers. 
+
+You have access to two specialized agents:
+1. SkillAgent - for creating skill roadmaps and learning paths
+2. JobAgent - for exploring job roles, salaries, and career preparation
+
+Use the appropriate handoff tool when:
+- User asks about skills, learning, or skill development → use handoff_to_skill
+- User asks about job titles, salaries, or career preparation → use handoff_to_job
+
+Always be helpful and guide users to the right specialist.""",
         model=model,
         handoffs=[
-            handoff(skill_agent, on_handoff=lambda ctx: on_handoff(skill_agent, ctx)),
-            handoff(job_agent, on_handoff=lambda ctx: on_handoff(job_agent, ctx)),
+            handoff(skill_agent, tool_name_override="handoff_to_skill", tool_description_override="Handoff to SkillAgent for skill roadmaps"),
+            handoff(job_agent, tool_name_override="handoff_to_job", tool_description_override="Handoff to JobAgent for job roles and salaries"),
         ]
     )
 
@@ -101,13 +114,40 @@ async def main(message: cl.Message):
         result = Runner.run_sync(agent, history, run_config=config)
         final = result.final_output
 
+        # Check if handoff occurred - with better error handling
+        try:
+            if hasattr(result, 'final_agent') and result.final_agent and result.final_agent != agent:
+                # Show handoff message
+                agent_info = {
+                    "SkillAgent": {
+                        "emoji": "📚",
+                        "description": "I'll create a detailed skill roadmap to help you succeed in your chosen field!"
+                    },
+                    "JobAgent": {
+                        "emoji": "💼",
+                        "description": "I'll help you explore job roles, salaries, and career preparation strategies!"
+                    }
+                }
+                
+                # Safely get agent name
+                agent_name = getattr(result.final_agent, 'name', str(result.final_agent))
+                info = agent_info.get(agent_name, {"emoji": "🤖", "description": "I'll help you with your request!"})
+                
+                await cl.Message(
+                    content=f"{info['emoji']} **Switching to {agent_name}**\n\n{info['description']}",
+                    author="System"
+                ).send()
+        except Exception as handoff_error:
+            print(f"Handoff message error: {handoff_error}")
+            # Continue without showing handoff message
+
         msg.content = final
         await msg.update()
 
-        history.append({"role": "developer", "content": final})
+        history.append({"role": "assistant", "content": final})
         cl.user_session.set("chat_history", history)
 
     except Exception as e:
-        msg.content = f"❌ Error: {e}"
+        msg.content = f"❌ Error: {str(e)}"
         await msg.update()
         print(f"Error: {e}")

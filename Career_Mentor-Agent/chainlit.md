@@ -1,14 +1,22 @@
-# Welcome to Chainlit! 🚀🤖
+# Welcome to Career Mentor AI! 🎓
 
-Hi there, Developer! 👋 We're excited to have you on board. Chainlit is a powerful tool designed to help you prototype, debug and share applications built on top of LLMs.
+Hi there! I'm your AI career mentor, designed to help you explore and plan your professional journey.
 
-## Useful Links 🔗
+## What I Can Help You With
 
-- **Documentation:** Get started with our comprehensive [Chainlit Documentation](https://docs.chainlit.io) 📚
-- **Discord Community:** Join our friendly [Chainlit Discord](https://discord.gg/k73SQ3FyUh) to ask questions, share your projects, and connect with other developers! 💬
+- **Career Exploration**: Discover different career paths based on your interests
+- **Skill Roadmaps**: Get step-by-step guidance on skills needed for your chosen field
+- **Job Insights**: Learn about specific roles, responsibilities, and preparation strategies
 
-We can't wait to see what you create with Chainlit! Happy coding! 💻😊
+## How It Works
 
-## Welcome screen
+I use a team of specialized AI agents to provide the best guidance:
+- **CareerAgent**: Helps you explore different career fields
+- **SkillAgent**: Creates detailed skill development roadmaps
+- **JobAgent**: Provides insights into specific job roles and requirements
 
-To modify the welcome screen, edit the `chainlit.md` file at the root of your project. If you do not want a welcome screen, just leave this file empty.
+## Getting Started
+
+Simply tell me about your career interests, goals, or any questions you have! I'll automatically connect you with the right specialist to help you succeed.
+
+Ready to start your career journey? Let's begin! 🚀
